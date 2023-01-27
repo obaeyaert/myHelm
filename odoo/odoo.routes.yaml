@@ -1,0 +1,38 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: odoo
+  labels:
+    app: odoo
+    server: odoo
+spec:
+  entryPoints:
+  - http
+  routes:
+  - kind: Rule
+    match: Host(`odoo.karbonalpha.com`)
+    middlewares:
+    - name: https-redirect
+      namespace: traefik
+    services:
+    - name: odoo
+      port: 80
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: odoo-tls
+  labels:
+    app: odoo
+    server: odoo
+spec:
+  entryPoints:
+  - https
+  routes:
+  - kind: Rule
+    match: Host(`odoo.karbonalpha.com`)
+    services:
+    - name: odoo
+      port: 80
+  tls:
+    certResolver: default

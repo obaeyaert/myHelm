@@ -1,0 +1,38 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: phpmyadmin
+  labels:
+    app: phpmyadmin
+    server: phpmyadmin
+spec:
+  entryPoints:
+  - http
+  routes:
+  - kind: Rule
+    match: Host(`db2.karbonalpha.com`)
+    middlewares:
+    - name: https-redirect
+      namespace: traefik
+    services:
+    - name: phpmyadmin
+      port: 80
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: phpmyadmin-tls
+  labels:
+    app: phpmyadmin
+    server: phpmyadmin
+spec:
+  entryPoints:
+  - https
+  routes:
+  - kind: Rule
+    match: Host(`db2.karbonalpha.com`)
+    services:
+    - name: phpmyadmin
+      port: 80
+  tls:
+    certResolver: default

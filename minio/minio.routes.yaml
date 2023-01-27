@@ -1,0 +1,51 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio
+  labels:
+    app: minio
+    server: minio
+spec:
+  entryPoints:
+  - http
+  routes:
+  - kind: Rule
+    match: Host(`s3.karbonalpha.com`)
+    middlewares:
+    - name: https-redirect
+      namespace: traefik
+    services:
+    - name: minio
+      port: 9000
+  - kind: Rule
+    match: Host(`s3.ui.karbonalpha.com`)
+    middlewares:
+    - name: https-redirect
+      namespace: traefik
+    services:
+    - name: minio-console
+      port: 9001
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio-tls
+  labels:
+    app: minio
+    server: minio
+spec:
+  entryPoints:
+  - https
+  routes:
+  - kind: Rule
+    match: Host(`s3.karbonalpha.com`)
+    services:
+    - name: minio
+      port: 9000
+  - kind: Rule
+    match: Host(`s3.ui.karbonalpha.com`)
+    services:
+    - name: minio-console
+      port: 9001
+  tls:
+    certResolver: default
